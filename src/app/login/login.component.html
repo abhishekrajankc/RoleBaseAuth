@@ -1,0 +1,80 @@
+<div class="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 px-4">
+  <div class="w-full max-w-md">
+    <div class="rounded-2xl bg-white p-8 shadow-lg">
+      <div class="mb-8 text-center">
+        <h1 class="text-2xl font-bold text-gray-900">RoleBaseAuth</h1>
+        <p class="mt-2 text-sm text-gray-500">Sign in to your account</p>
+      </div>
+
+      @if (error(); as err) {
+        <div class="mb-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">{{ err }}</div>
+      }
+
+      @if (loading()) {
+        <!-- Loading skeleton -->
+        <div class="space-y-5" aria-label="Loading">
+          <div class="h-10 animate-pulse rounded-lg bg-gray-200"></div>
+          <div class="h-10 animate-pulse rounded-lg bg-gray-200"></div>
+          <div class="h-10 animate-pulse rounded-lg bg-gray-300"></div>
+        </div>
+      }
+
+      @if (!loading()) {
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5" novalidate>
+          <div>
+            <label for="email" class="mb-1.5 block text-sm font-medium text-gray-700">Email</label>
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              autocomplete="email"
+              placeholder="you@example.com"
+              class="w-full rounded-lg border px-4 py-2.5 text-sm outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              [class.border-red-400]="email.invalid && email.touched"
+            />
+            @if (email.invalid && email.touched) {
+              <p class="mt-1.5 text-xs text-red-600">
+                @if (email.errors?.['required']) { Email is required. }
+                @if (email.errors?.['email']) { Enter a valid email. }
+              </p>
+            }
+          </div>
+
+          <div>
+            <label for="password" class="mb-1.5 block text-sm font-medium text-gray-700">Password</label>
+            <input
+              id="password"
+              type="password"
+              formControlName="password"
+              autocomplete="current-password"
+              placeholder="Enter your password"
+              class="w-full rounded-lg border px-4 py-2.5 text-sm outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              [class.border-red-400]="password.invalid && password.touched"
+            />
+            @if (password.invalid && password.touched) {
+              <p class="mt-1.5 text-xs text-red-600">
+                @if (password.errors?.['required']) { Password is required. }
+                @if (password.errors?.['minlength']) { Min 6 characters. }
+              </p>
+            }
+          </div>
+
+          <button
+            type="submit"
+            [disabled]="form.invalid"
+            class="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Sign in
+          </button>
+        </form>
+      }
+
+      <p class="mt-6 text-center text-xs text-gray-400">Demo: admin1&#64;test.com / password123</p>
+      <p class="mt-6 text-center text-xs text-gray-400">Demo: admin2&#64;test.com / adminpass</p>
+      <p class="mt-6 text-center text-xs text-gray-400">Demo: user1&#64;test.com / userpass</p> 
+      <p class="mt-6 text-center text-xs text-gray-400">Demo: user2&#64;test.com / password456</p>
+
+
+    </div>
+  </div>
+</div>
