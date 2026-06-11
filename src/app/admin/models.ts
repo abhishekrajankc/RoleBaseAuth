@@ -62,3 +62,22 @@ export interface UsersResponse {
   skip: number;
   limit: number;
 }
+
+export type SortField = 'title' | 'category' | 'price' | 'stock';
+export type SortDir = 'asc' | 'desc';
+
+export type OrderStatus = 'Pending' | 'Confirmed' | 'Cancelled';
+
+export interface OrderWithStatus extends Cart {
+  status: OrderStatus;
+  date: string;
+}
+
+export interface ProductFormData {
+  title: string;
+  description: string;
+  category: string;
+  price: number;
+  stock: number;
+  brand: string;
+}

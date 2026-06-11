@@ -11,3 +11,20 @@
       (after this the issue remains the same, so changed the default value from null to EmptyString).
 
     - fix the same parent scroll issue in the orders tab also
+
+- Create centralized AdminStore (signal-based) for products, orders, and shared state
+
+- Create admin routes as lazy child routes (/admin/analytics, /admin/products, /admin/orders)
+
+- Refactor admin component as shell with router-outlet
+
+- Extract analytics into dedicated lazy component
+
+- Extract products into dedicated lazy component (paginated, sortable, debounced search, add/edit/delete, stock stream)
+
+- Build orders page with paginated/sortable table, status filter, date range filter
+
+- Add order detail side-panel with inline status update dropdown
+
+- Wire shared state so status updates reflect immediately
+ 

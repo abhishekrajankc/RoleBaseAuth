@@ -7,7 +7,7 @@
 
         <div class="flex gap-4">
           @if (role() === 'admin') {
-            <a routerLink="/admin" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">Dashboard</a>
+            <a routerLink="/admin/analytics" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">Dashboard</a>
           }
           <a routerLink="/shop" class="text-sm font-medium text-gray-600 hover:text-gray-900">Shop</a>
         </div>
@@ -26,12 +26,10 @@
   </nav>
 }
 
-<!-- Page content — scrolls naturally, no extra wrapper -->
 <main>
   <router-outlet />
 </main>
 
-<!-- Footer at bottom of page content -->
 <footer class="border-t bg-white px-4 py-3 text-center text-xs text-gray-400">
   &copy; 2026 RoleBaseAuth. All rights reserved.
 </footer>

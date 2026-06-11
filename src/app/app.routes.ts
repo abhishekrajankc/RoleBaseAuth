@@ -10,6 +10,25 @@ export const routes: Routes = [
     path: 'admin',
     canActivate: [authGuard, adminGuard],
     loadComponent: () => import('./admin/admin.component').then((c) => c.AdminComponent),
+    children: [
+      {
+        path: 'analytics',
+        loadComponent: () => import('./admin/analytics/analytics.component').then((c) => c.AnalyticsComponent),
+      },
+      {
+        path: 'products',
+        loadComponent: () => import('./admin/products/products.component').then((c) => c.ProductsComponent),
+      },
+      {
+        path: 'orders',
+        loadComponent: () => import('./admin/orders/orders.component').then((c) => c.OrdersComponent),
+      },
+      {
+        path: '',
+        redirectTo: 'analytics',
+        pathMatch: 'full',
+      },
+    ],
   },
   {
     path: 'shop',
