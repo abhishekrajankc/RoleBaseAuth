@@ -2,13 +2,12 @@ import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { CurrencyPipe, NgOptimizedImage } from '@angular/common';
-import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs';
 import { AdminStore } from '../../../../core/store/admin.store';
 import { Product, SortDir, SortField } from '../../../../shared/models';
 
 @Component({
   selector: 'app-products',
-  standalone: true,
   imports: [CurrencyPipe, FormsModule, NgOptimizedImage],
   templateUrl: './products.component.html',
 })
@@ -41,10 +40,14 @@ export class ProductsComponent implements OnInit {
       .pipe(
         debounceTime(300),
         distinctUntilChanged(),
-        switchMap((q) => { this.currentPage.set(0); return this.store.fetchProducts(0, this.pageSize, q || undefined); }),
+
+        tap(() => this.currentPage.set(0)),
+        switchMap((q) => this.store.fetchProducts(0, this.pageSize, q || undefined)),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe();
+
+    this.destroyRef.onDestroy(() => this.store.stopStockSimulation());
   }
 
   onSearch(query: string): void {
@@ -99,9 +102,21 @@ export class ProductsComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
   }
 
-  openAddModal(): void { this.editingProduct.set(null); this.formData.set({ title: '', description: '', category: '', price: 0, stock: 0, brand: '' }); this.showModal.set(true); }
-  openEditModal(p: Product): void { this.editingProduct.set(p); this.formData.set({ title: p.title, description: p.description, category: p.category, price: p.price, stock: p.stock, brand: p.brand }); this.showModal.set(true); }
-  closeModal(): void { this.showModal.set(false); this.editingProduct.set(null); }
+  openAddModal(): void {
+    this.editingProduct.set(null);
+    this.formData.set({ title: '', description: '', category: '', price: 0, stock: 0, brand: '' });
+    this.showModal.set(true);
+  }
+
+  openEditModal(p: Product): void {
+    this.editingProduct.set(p);
+    this.formData.set({ title: p.title, description: p.description, category: p.category, price: p.price, stock: p.stock, brand: p.brand });
+    this.showModal.set(true);
+  }
+  closeModal(): void {
+    this.showModal.set(false);
+    this.editingProduct.set(null);
+  }
 
   submitForm(): void {
     const data = this.formData();
@@ -112,5 +127,7 @@ export class ProductsComponent implements OnInit {
     }
   }
 
-  deleteProduct(id: number): void { this.store.deleteProduct(id); }
+  deleteProduct(id: number): void {
+    this.store.deleteProduct(id);
+  }
 }

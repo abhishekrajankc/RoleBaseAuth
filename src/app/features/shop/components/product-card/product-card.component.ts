@@ -16,7 +16,6 @@ import { Product } from '../../../../shared/models';
 
 @Component({
   selector: 'app-product-card',
-  standalone: true,
   imports: [CurrencyPipe, DecimalPipe, NgOptimizedImage],
   templateUrl: './product-card.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

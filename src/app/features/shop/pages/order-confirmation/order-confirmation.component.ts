@@ -3,7 +3,6 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-order-confirmation',
-  standalone: true,
   imports: [RouterLink],
   templateUrl: './order-confirmation.component.html',
 })

@@ -6,7 +6,6 @@ import { markStepComplete } from '../../guards/checkout-step.guard';
 
 @Component({
   selector: 'app-checkout-step2',
-  standalone: true,
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './checkout-step2.component.html',
 })

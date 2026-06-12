@@ -7,7 +7,6 @@ import { markStepComplete } from '../../guards/checkout-step.guard';
 
 @Component({
   selector: 'app-checkout-step1',
-  standalone: true,
   imports: [CurrencyPipe, CartTotalPipe, RouterLink, NgOptimizedImage],
   templateUrl: './checkout-step1.component.html',
 })

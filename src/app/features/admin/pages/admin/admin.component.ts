@@ -5,7 +5,6 @@ import { AdminStore } from '../../../../core/store/admin.store';
 
 @Component({
   selector: 'app-admin',
-  standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './admin.component.html',
 })

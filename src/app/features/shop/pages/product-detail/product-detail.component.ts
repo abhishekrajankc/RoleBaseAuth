@@ -1,16 +1,15 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CurrencyPipe, DecimalPipe, NgOptimizedImage } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { map, Observable } from 'rxjs';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { map, Observable, switchMap } from 'rxjs';
 import { Product } from '../../../../shared/models';
 import { AdminStore } from '../../../../core/store/admin.store';
 import { CartService } from '../../../../shared/services/cart.service';
 
 @Component({
   selector: 'app-product-detail',
-  standalone: true,
   imports: [CurrencyPipe, DecimalPipe, RouterLink, NgOptimizedImage],
   templateUrl: './product-detail.component.html',
 })
@@ -22,27 +21,39 @@ export class ProductDetailComponent {
   private readonly router = inject(Router);
 
   /** Product resolved by the route resolver — guaranteed to exist at this point */
-  readonly product = this.route.snapshot.data['product'] as Product;
+  readonly product = toSignal(
+    this.route.data.pipe(map(data => data['product'] as Product))
+  );
 
   /** Quantity selector */
   readonly quantity = signal(1);
 
   /** Related products from the same category */
   readonly relatedProducts = toSignal(
-    this.http
-      .get<{ products: Product[] }>(
-        `https://dummyjson.com/products/category/${this.product.category}?limit=5`
-      )
-      .pipe(
-        map((r) => r.products.filter((p) => p.id !== this.product.id).slice(0, 4)),
-      ),
-    { initialValue: [] as Product[] },
+    toObservable(this.product).pipe(
+      switchMap((currentProduct: any) => {
+        const url = `https://dummyjson.com/products/category/${currentProduct.category}?limit=5`;
+
+        return this.http.get<{ products: Product[] }>(url).pipe(
+          // Filter out the active product so you don't recommend the item they are already viewing
+          map((r) => r.products.filter((p) => p.id !== currentProduct.id).slice(0, 4))
+        );
+      })
+    ),
+    { initialValue: [] as Product[] }
   );
 
-  protected readonly inStock = signal(this.product.stock > 0);
+  //protected readonly inStock = signal(this.product()?.stock > 0);
+  readonly inStock = computed(() => {
+    const CurrentProduct = this.product();
+    return CurrentProduct ? CurrentProduct.stock > 0 : false;
+  })
+
 
   protected increaseQty(): void {
-    this.quantity.update((q) => Math.min(q + 1, this.product.stock));
+    const currentProduct = this.product();
+    if (currentProduct)
+      this.quantity.update((q) => Math.min(q + 1, currentProduct.stock));
   }
 
   protected decreaseQty(): void {
@@ -52,8 +63,10 @@ export class ProductDetailComponent {
   readonly addedMessage = signal<string | null>(null);
 
   protected addToCart(): void {
-    this.cart.add(this.product, this.quantity());
-    this.addedMessage.set(`Added ${this.quantity()} × ${this.product.title} to cart!`);
+    const currentProcuct = this.product();
+    if (currentProcuct)
+      this.cart.add(currentProcuct , this.quantity());
+    this.addedMessage.set(`Added ${this.quantity()} × ${this.product()?.title} to cart!`);
     this.quantity.set(1);
     setTimeout(() => this.addedMessage.set(null), 4000);
   }
@@ -63,6 +76,6 @@ export class ProductDetailComponent {
   }
 
   protected notifyMe(): void {
-    alert(`You'll be notified when ${this.product.title} is back in stock.`);
+    alert(`You'll be notified when ${this.product()?.title} is back in stock.`);
   }
 }

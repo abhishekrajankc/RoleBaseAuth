@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CurrencyPipe, NgOptimizedImage } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -9,7 +9,6 @@ type StatusFilter = 'All' | 'Pending' | 'Confirmed' | 'Cancelled';
 
 @Component({
   selector: 'app-orders',
-  standalone: true,
   imports: [CurrencyPipe, FormsModule, NgOptimizedImage],
   templateUrl: './orders.component.html',
 })
@@ -22,11 +21,61 @@ export class OrdersComponent implements OnInit {
   readonly dateTo = signal('');
   readonly currentPage = signal(0);
   readonly pageSize = 10;
+
   readonly sortField = signal<'id' | 'date' | 'total' | 'status'>('id');
   readonly sortDir = signal<'asc' | 'desc'>('asc');
 
   // Side panel
   readonly selectedOrder = signal<OrderWithStatus | null>(null);
+
+  public filteredOrders = computed(() => {
+    const rawOrders = this.store.orders();
+    const sf = this.statusFilter();
+    const from = this.dateFrom();
+    const to = this.dateTo();
+
+    if (!rawOrders.length) return [];
+
+    return rawOrders.filter((o) => {
+      if (sf !== 'All' && o.status !== sf) return false;
+      if (from && o.date < from) return false;
+      if (to && o.date > to) return false;
+      return true;
+    });
+  });
+  
+  public totalFiltered = computed(() => this.filteredOrders().length);
+
+  public pagedOrders = computed(() => {
+    const list = [...this.filteredOrders()]; // Reads directly from the cached filter step!
+    const field = this.sortField();
+    const dir = this.sortDir();
+    const page = this.currentPage();
+
+    if (!list.length) return [];
+
+    // Sort
+    list.sort((a: any, b: any) => {
+      const valA = field === 'date' || field === 'status' ? a[field] : +a[field];
+      const valB = field === 'date' || field === 'status' ? b[field] : +b[field];
+
+      if (typeof valA === 'string') {
+        return dir === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+      }
+      return dir === 'asc' ? valA - valB : valB - valA;
+    });
+
+    // Slice
+    const start = page * this.pageSize;
+    return list.slice(start, start + this.pageSize);
+  });
+  public totalPages = computed(() => {
+    return Math.ceil(this.totalFiltered() / this.pageSize);
+  });
+  public pageNumbers = computed(() => {
+    return Array.from({ length: this.totalPages() }, (_, i) => i);
+  });
+
 
   ngOnInit(): void {
     this.store.fetchOrders().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
@@ -41,47 +90,6 @@ export class OrdersComponent implements OnInit {
     return order.products.map((p) => p.title).join(', ');
   }
 
-  // ---- Filtering ----
-  get filteredOrders(): OrderWithStatus[] {
-    let list = [...this.store.orders()];
-
-    // Status filter
-    const sf = this.statusFilter();
-    if (sf !== 'All') list = list.filter((o) => o.status === sf);
-
-    // Date range
-    const from = this.dateFrom();
-    const to = this.dateTo();
-    if (from) list = list.filter((o) => o.date >= from);
-    if (to) list = list.filter((o) => o.date <= to);
-
-    return list;
-  }
-
-  get totalFiltered(): number {
-    return this.filteredOrders.length;
-  }
-
-  get totalPages(): number {
-    return Math.ceil(this.totalFiltered / this.pageSize);
-  }
-
-  get pagedOrders(): OrderWithStatus[] {
-    // Sort
-    const field = this.sortField();
-    const dir = this.sortDir();
-    const sorted = [...this.filteredOrders].sort((a, b) => {
-      if (field === 'id') return dir === 'asc' ? a.id - b.id : b.id - a.id;
-      if (field === 'total') return dir === 'asc' ? a.total - b.total : b.total - a.total;
-      if (field === 'date') return dir === 'asc' ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date);
-      if (field === 'status') return dir === 'asc' ? a.status.localeCompare(b.status) : b.status.localeCompare(a.status);
-      return 0;
-    });
-
-    const start = this.currentPage() * this.pageSize;
-    return sorted.slice(start, start + this.pageSize);
-  }
-
   toggleSort(field: 'id' | 'date' | 'total' | 'status'): void {
     if (this.sortField() === field) this.sortDir.update((d) => (d === 'asc' ? 'desc' : 'asc'));
     else { this.sortField.set(field); this.sortDir.set('asc'); }
@@ -93,7 +101,7 @@ export class OrdersComponent implements OnInit {
   }
 
   loadPage(page: number): void {
-    if (page < 0 || page >= this.totalPages) return;
+    if (page < 0 || page >= this.totalPages()) return;
     this.currentPage.set(page);
   }
 

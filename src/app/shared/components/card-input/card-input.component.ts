@@ -7,7 +7,6 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@a
  */
 @Component({
   selector: 'app-card-input',
-  standalone: true,
   imports: [ReactiveFormsModule],
   providers: [
     {

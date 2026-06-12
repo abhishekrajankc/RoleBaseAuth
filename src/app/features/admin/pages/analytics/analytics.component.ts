@@ -8,7 +8,6 @@ import { DestroyRef, signal } from '@angular/core';
 
 @Component({
   selector: 'app-analytics',
-  standalone: true,
   imports: [CurrencyPipe],
   templateUrl: './analytics.component.html',
 })

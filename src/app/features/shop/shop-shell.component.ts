@@ -3,7 +3,6 @@ import { RouterLink, RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-shop-shell',
-  standalone: true,
   imports: [RouterOutlet, RouterLink],
   templateUrl: './shop-shell.component.html',
 })

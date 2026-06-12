@@ -12,7 +12,6 @@ import { FieldConfig } from '../../../../shared/components/form-field/form-field
 
 @Component({
   selector: 'app-checkout-step3',
-  standalone: true,
   imports: [ReactiveFormsModule, CardInputComponent, CurrencyPipe, CartTotalPipe, RouterLink],
   templateUrl: './checkout-step3.component.html',
 })

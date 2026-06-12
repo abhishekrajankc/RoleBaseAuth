@@ -18,7 +18,6 @@ export interface FieldConfig {
 
 @Component({
   selector: 'app-form-field',
-  standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './form-field.component.html',
    

@@ -16,7 +16,7 @@
         class="rounded-lg border px-3 py-2 text-sm outline-none focus:border-indigo-500" placeholder="From" />
       <input type="date" [ngModel]="dateTo()" (ngModelChange)="dateTo.set($event); currentPage.set(0)"
         class="rounded-lg border px-3 py-2 text-sm outline-none focus:border-indigo-500" placeholder="To" />
-      <span class="text-sm text-gray-500">{{ totalFiltered }} orders</span>
+      <span class="text-sm text-gray-500">{{ totalFiltered() }} orders</span>
     </div>
 
     @if (store.loadingOrders()) {
@@ -37,7 +37,7 @@
             </tr>
           </thead>
           <tbody class="divide-y">
-            @for (o of pagedOrders; track o.id) {
+            @for (o of pagedOrders(); track o.id) {
               <tr class="cursor-pointer hover:bg-gray-50" (click)="openDetail(o)">
                 <td class="px-4 py-3 font-medium text-gray-900">#{{ o.id }}</td>
                 <td class="px-4 py-3 text-gray-600">{{ getUserName(o.userId) }}</td>
@@ -63,17 +63,23 @@
 
       <div class="mt-4 flex items-center gap-2">
         <button (click)="loadPage(currentPage() - 1)" [disabled]="currentPage() === 0"
-          class="rounded border px-3 py-1 text-sm disabled:opacity-40">Prev</button>
-        @for (_ of [].constructor(totalPages); track $index) {
-          @if ($index >= currentPage() - 2 && $index <= currentPage() + 2) {
-            <button (click)="loadPage($index)" class="rounded border px-3 py-1 text-sm"
-              [class.bg-indigo-600]="$index === currentPage()" [class.text-white]="$index === currentPage()">
-              {{ $index + 1 }}
-            </button>
-          }
+                class="rounded border px-3 py-1 text-sm disabled:opacity-40">
+          Prev
+        </button>
+
+        @for (pageIdx of pageNumbers(); track pageIdx) {
+        @if (pageIdx >= currentPage() - 2 && pageIdx <= currentPage() + 2) {
+        <button (click)="loadPage(pageIdx)" class="rounded border px-3 py-1 text-sm"
+                [class.bg-indigo-600]="pageIdx === currentPage()" [class.text-white]="pageIdx === currentPage()">
+          {{ pageIdx + 1 }}
+        </button>
         }
-        <button (click)="loadPage(currentPage() + 1)" [disabled]="currentPage() >= totalPages - 1"
-          class="rounded border px-3 py-1 text-sm disabled:opacity-40">Next</button>
+        }
+
+        <button (click)="loadPage(currentPage() + 1)" [disabled]="currentPage() >= totalPages() - 1"
+                class="rounded border px-3 py-1 text-sm disabled:opacity-40">
+          Next
+        </button>
       </div>
     }
   </div>

@@ -7,7 +7,7 @@ import { User } from '../../../core/auth/users';
 
 @Component({
   selector: 'app-login',
-  standalone: true,
+  
   imports: [ReactiveFormsModule],
   templateUrl: './login.component.html',
   // OnPush: the component only depends on signals and form state — no need

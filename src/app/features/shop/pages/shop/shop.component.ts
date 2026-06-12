@@ -11,7 +11,6 @@ import { PerformanceTrackerService } from '../../../../shared/services/tracker.s
 
 @Component({
   selector: 'app-shop',
-  standalone: true,
   imports: [ProductCardComponent, DecimalPipe, FormsModule],
   templateUrl: './shop.component.html',
 })

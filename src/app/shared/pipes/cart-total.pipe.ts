@@ -9,7 +9,6 @@ export interface CartTotals {
 
 @Pipe({
   name: 'cartTotal',
-  standalone: true,
 })
 export class CartTotalPipe implements PipeTransform {
   transform(items: CartItem[], taxRate?: number): CartTotals {

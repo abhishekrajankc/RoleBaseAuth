@@ -5,7 +5,6 @@ import { CartService } from './shared/services/cart.service';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   imports: [RouterOutlet, RouterLink],
   templateUrl: './app.html',
 })
