@@ -1,0 +1,64 @@
+{
+  "fields": [
+    {
+      "key": "fullName",
+      "label": "Full Name",
+      "type": "text",
+      "validators": { "required": true, "minLength": 2 }
+    },
+    {
+      "key": "email",
+      "label": "Email Address",
+      "type": "email",
+      "validators": { "required": true, "email": true }
+    },
+    {
+      "key": "phone",
+      "label": "Phone Number",
+      "type": "tel",
+      "validators": { "required": true, "pattern": "^[+]?[0-9]{10,15}$" }
+    },
+    {
+      "key": "addressLine1",
+      "label": "Address Line 1",
+      "type": "text",
+      "validators": { "required": true }
+    },
+    {
+      "key": "addressLine2",
+      "label": "Address Line 2",
+      "type": "text",
+      "validators": {}
+    },
+    {
+      "key": "city",
+      "label": "City",
+      "type": "text",
+      "validators": { "required": true }
+    },
+    {
+      "key": "state",
+      "label": "State / Province",
+      "type": "text",
+      "validators": { "required": true }
+    },
+    {
+      "key": "zipCode",
+      "label": "ZIP / Postal Code",
+      "type": "text",
+      "validators": { "required": true, "pattern": "^[0-9]{5,6}$" }
+    },
+    {
+      "key": "country",
+      "label": "Country",
+      "type": "text",
+      "validators": { "required": true }
+    },
+    {
+      "key": "deliveryNotes",
+      "label": "Delivery Notes",
+      "type": "textarea",
+      "validators": {}
+    }
+  ]
+}

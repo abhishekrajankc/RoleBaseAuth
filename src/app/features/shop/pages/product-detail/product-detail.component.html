@@ -1,0 +1,171 @@
+<div class="bg-gray-50">
+  <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-10">
+    <!-- Breadcrumb -->
+    <nav class="mb-6 text-sm text-gray-400">
+      <a routerLink="/shop" class="hover:text-indigo-600">Shop</a>
+      <span class="mx-2">/</span>
+      <a [routerLink]="['/shop']" [queryParams]="{ categories: product.category }" class="hover:text-indigo-600">
+        {{ product.category }}
+      </a>
+      <span class="mx-2">/</span>
+      <span class="text-gray-900">{{ product.title }}</span>
+    </nav>
+
+    <!-- Product section -->
+    <div class="overflow-hidden rounded-2xl bg-white shadow-sm">
+      <div class="flex flex-col gap-8 p-6 md:flex-row">
+        <!-- Images -->
+        <div class="w-full md:w-1/2">
+          <div class="relative aspect-square w-full overflow-hidden rounded-xl bg-gray-100">
+            <img
+              [ngSrc]="product.thumbnail"
+              [alt]="product.title"
+              fill
+              priority
+              class="object-cover"
+            />
+          </div>
+          @if (product.images.length > 1) {
+            <div class="mt-4 flex gap-3 overflow-x-auto">
+              @for (img of product.images; track img) {
+                <img
+                  [ngSrc]="img"
+                  alt=""
+                  width="80"
+                  height="80"
+                  class="h-20 w-20 shrink-0 rounded-lg object-cover ring-1 ring-gray-200"
+                />
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Info -->
+        <div class="flex w-full flex-col justify-center md:w-1/2">
+          <p class="mb-1 text-xs uppercase tracking-wide text-gray-400">{{ product.category }}</p>
+          <h1 class="mb-2 text-2xl font-bold text-gray-900">{{ product.title }}</h1>
+          <p class="mb-6 text-sm leading-relaxed text-gray-600">{{ product.description }}</p>
+
+          <!-- Pricing -->
+          <div class="mb-6">
+            <span class="text-3xl font-bold text-gray-900">{{ product.price | currency }}</span>
+            @if (product.discountPercentage > 5) {
+              <span class="ml-3 text-lg text-gray-400 line-through">
+                {{ (product.price * (1 + product.discountPercentage / 100)) | currency }}
+              </span>
+              <span class="ml-2 rounded-full bg-red-100 px-3 py-0.5 text-sm font-medium text-red-600">
+                -{{ product.discountPercentage | number:'1.0-0' }}%
+              </span>
+            }
+          </div>
+
+          <!-- Specs -->
+          <div class="mb-6 grid grid-cols-2 gap-3 text-sm">
+            <div>
+              <span class="text-gray-500">Brand</span>
+              <p class="font-medium text-gray-900">{{ product.brand }}</p>
+            </div>
+            <div>
+              <span class="text-gray-500">Rating</span>
+              <p class="font-medium text-yellow-600">{{ product.rating }} / 5</p>
+            </div>
+            <div>
+              <span class="text-gray-500">Stock</span>
+              <p class="font-medium text-gray-900">{{ product.stock }} units</p>
+            </div>
+            <div>
+              <span class="text-gray-500">Category</span>
+              <p class="font-medium text-gray-900 capitalize">{{ product.category }}</p>
+            </div>
+          </div>
+
+          @if (inStock()) {
+            <!-- Quantity selector + Add to Cart -->
+            <div class="mb-4 flex items-center gap-4">
+              <div class="flex items-center rounded-lg border">
+                <button
+                  (click)="decreaseQty()"
+                  [disabled]="quantity() <= 1"
+                  class="px-3 py-2 text-gray-600 hover:bg-gray-100 disabled:opacity-30"
+                >
+                  &minus;
+                </button>
+                <span class="min-w-[3rem] text-center font-medium">{{ quantity() }}</span>
+                <button
+                  (click)="increaseQty()"
+                  [disabled]="quantity() >= product.stock"
+                  class="px-3 py-2 text-gray-600 hover:bg-gray-100 disabled:opacity-30"
+                >
+                  +
+                </button>
+              </div>
+              <span class="text-xs text-gray-400">{{ product.stock }} available</span>
+            </div>
+
+            @if (addedMessage(); as msg) {
+              <div class="mb-2 overflow-hidden rounded-lg">
+                <div class="bg-green-50 px-4 py-2 text-center text-sm font-medium text-green-700">
+                  {{ msg }}
+                </div>
+                <button
+                  (click)="goToCart()"
+                  class="w-full bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-500 transition-colors"
+                >
+                  View Cart &rarr;
+                </button>
+              </div>
+            }
+
+            <button
+              (click)="addToCart()"
+              [disabled]="!!addedMessage()"
+              class="w-full rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {{ addedMessage() ? 'Added to Cart ✓' : 'Add to Cart' }}
+            </button>
+          } @else {
+            <!-- Out of stock -->
+            <div class="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+              This product is currently out of stock.
+            </div>
+            <button
+              (click)="notifyMe()"
+              class="w-full rounded-lg border border-gray-300 px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+            >
+              Notify me when available
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Products -->
+    @if (relatedProducts().length) {
+      <div class="mt-10">
+        <h2 class="mb-4 text-lg font-semibold text-gray-900">Related Products</h2>
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          @for (rp of relatedProducts(); track rp.id) {
+            <a
+              [routerLink]="['/shop/products', rp.id]"
+              class="group rounded-xl bg-white shadow-sm transition-shadow hover:shadow-md"
+            >
+              <div class="relative h-40 overflow-hidden rounded-t-xl bg-gray-100">
+                <img
+                  [ngSrc]="rp.thumbnail"
+                  [alt]="rp.title"
+                  fill
+                  class="object-cover"
+                />
+              </div>
+              <div class="p-3">
+                <p class="text-xs text-gray-400 line-clamp-1">{{ rp.category }}</p>
+                <p class="font-medium text-gray-900 line-clamp-1">{{ rp.title }}</p>
+                <p class="text-sm font-semibold text-gray-900">{{ rp.price | currency }}</p>
+              </div>
+            </a>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

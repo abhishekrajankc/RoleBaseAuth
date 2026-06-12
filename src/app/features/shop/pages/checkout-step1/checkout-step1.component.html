@@ -1,0 +1,60 @@
+<div class="mx-auto max-w-3xl">
+  <h1 class="mb-6 text-2xl font-bold text-gray-900">Cart Review</h1>
+
+  @if (cart.items().length === 0) {
+    <div class="rounded-xl bg-white p-8 text-center text-gray-400">
+      Your cart is empty.
+      <a routerLink="/shop" class="ml-1 text-indigo-600 hover:underline">Continue shopping</a>
+    </div>
+  } @else {
+    <div class="space-y-4">
+      @for (item of cart.items(); track item.product.id) {
+        <div class="flex items-center gap-4 rounded-xl bg-white p-4 shadow-sm">
+          <img
+            [ngSrc]="item.product.thumbnail"
+            [alt]="item.product.title"
+            width="64"
+            height="64"
+            class="h-16 w-16 rounded-lg object-cover"
+          />
+          <div class="flex-1">
+            <p class="font-medium text-gray-900">{{ item.product.title }}</p>
+            <p class="text-sm text-gray-500">{{ item.product.price | currency }} each</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              (click)="updateQty(item.product.id, item.quantity - 1)"
+              [disabled]="item.quantity <= 1"
+              class="rounded border px-2 py-1 text-sm disabled:opacity-30"
+            >&minus;</button>
+            <span class="min-w-[2rem] text-center">{{ item.quantity }}</span>
+            <button
+              (click)="updateQty(item.product.id, item.quantity + 1)"
+              [disabled]="item.quantity >= item.product.stock"
+              class="rounded border px-2 py-1 text-sm disabled:opacity-30"
+            >+</button>
+          </div>
+          <p class="min-w-[5rem] text-right font-semibold">{{ item.product.price * item.quantity | currency }}</p>
+          <button (click)="remove(item.product.id)" class="text-sm text-red-500 hover:underline">Remove</button>
+        </div>
+      }
+    </div>
+
+    @let totals = cart.items() | cartTotal:taxRate;
+    <div class="mt-6 rounded-xl bg-white p-5 shadow-sm">
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between"><span class="text-gray-500">Subtotal</span><strong>{{ totals.subtotal | currency }}</strong></div>
+        <div class="flex justify-between"><span class="text-gray-500">Tax ({{ taxRate * 100 }}%)</span><strong>{{ totals.tax | currency }}</strong></div>
+        <div class="flex justify-between border-t pt-2 text-base">
+          <span class="font-semibold text-gray-900">Grand Total</span>
+          <strong class="text-indigo-600">{{ totals.grandTotal | currency }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <a routerLink="/shop/checkout/step/2" (click)="proceed()"
+      class="mt-6 inline-block w-full rounded-lg bg-indigo-600 px-6 py-3 text-center text-sm font-semibold text-white hover:bg-indigo-500">
+      Proceed to Delivery
+    </a>
+  }
+</div>

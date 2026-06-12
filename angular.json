@@ -49,6 +49,18 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "local-prod": {
+              "optimization": {
+                "scripts": true,
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": true
+                },
+                "fonts": true
+              },
+              "extractLicenses": false,
+              "sourceMap": true
             }
           },
           "defaultConfiguration": "production"
@@ -61,6 +73,9 @@
             },
             "development": {
               "buildTarget": "RoleBaseAuth:build:development"
+            },
+            "local-prod": {
+              "buildTarget": "RoleBaseAuth:build:local-prod"
             }
           },
           "defaultConfiguration": "development"

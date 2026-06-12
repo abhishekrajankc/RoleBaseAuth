@@ -27,4 +27,22 @@
 - Add order detail side-panel with inline status update dropdown
 
 - Wire shared state so status updates reflect immediately
+
+
+- Create shared product store/service for shop + admin
+- Build ProductCardComponent (OnPush, live stock badge)
+- Build product catalogue grid with pagination, skeletons, empty/error states
+- Add filter bar: category chips, price range slider, in-stock toggle
+- Wire filters to URL query params for deep-linking
+- Add product detail view (modal/panel) 
+
+
+
+- Persists across navigation via a shared CartService (signal-based). A cart icon in the nav shows the live item count. Cart contents survive a page refresh (use localStorage).
+
+- Show cart items with quantity adjustment and removal. Compute the running subtotal, tax (configurable rate), and grand total using a pure pipe. An empty cart redirects to /shop.
+
+ 
+-  On submit, POST the order to the mock endpoint. Show an optimistic success state immediately, then reconcile or roll back on failure. On confirmed success, clear the cart and navigate to a /shop/order-confirmation/:id page
+
  

@@ -1,0 +1,110 @@
+<div class="mx-auto max-w-2xl">
+  <h1 class="mb-6 text-2xl font-bold text-gray-900">Payment</h1>
+
+  <form [formGroup]="form" class="rounded-xl bg-white p-6 shadow-sm">
+    <!-- Card details -->
+    <div class="mb-6 space-y-4">
+      <h2 class="text-lg font-semibold text-gray-900">Card Details</h2>
+
+      <app-card-input formControlName="cardNumber" />
+
+      <div>
+        <label class="mb-1 block text-sm font-medium text-gray-700">Name on Card</label>
+        <input type="text" formControlName="cardName" class="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-indigo-500" />
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="mb-1 block text-sm font-medium text-gray-700">Expiry (MM/YY)</label>
+          <input type="text" formControlName="expiry" placeholder="MM/YY" maxlength="5"
+            class="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-indigo-500" />
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium text-gray-700">CVV</label>
+          <input type="text" formControlName="cvv" placeholder="123" maxlength="4"
+            class="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-indigo-500" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Billing address toggle -->
+    <div class="mb-6">
+      <label class="flex cursor-pointer items-center gap-2 text-sm text-gray-700">
+        <input type="checkbox" [checked]="sameAsDelivery()" (change)="toggleBilling()" class="h-4 w-4 accent-indigo-600" />
+        Same as delivery address
+      </label>
+    </div>
+
+    <!-- Billing address fields -->
+    @if (!sameAsDelivery()) {
+      <div class="mb-6 space-y-4">
+        <h2 class="text-lg font-semibold text-gray-900">Billing Address</h2>
+        <div class="grid gap-4 sm:grid-cols-2">
+          @for (field of billingFields(); track field.key) {
+            <div [class.sm:col-span-2]="field.type === 'textarea'">
+              <div>
+                <label [for]="field.key" class="mb-1 block text-sm font-medium text-gray-700">{{ field.label }}</label>
+                @if (field.type === 'textarea') {
+                  <textarea
+                    [id]="field.key"
+                    [formControlName]="field.key"
+                    [placeholder]="field.placeholder ?? ''"
+                    rows="3"
+                    class="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-indigo-500"
+                  ></textarea>
+                } @else {
+                  <input
+                    [id]="field.key"
+                    [type]="field.type"
+                    [formControlName]="field.key"
+                    [placeholder]="field.placeholder ?? ''"
+                    class="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-indigo-500"
+                  />
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Order summary -->
+    @let totals = cart.items() | cartTotal:taxRate;
+    <div class="border-t pt-4">
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between">
+          <span class="text-gray-500">Subtotal</span>
+          <strong>{{ totals.subtotal | currency }}</strong>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-500">Tax</span>
+          <strong>{{ totals.tax | currency }}</strong>
+        </div>
+        <div class="flex justify-between border-t pt-2 text-base">
+          <span class="font-semibold text-gray-900">Total to charge</span>
+          <strong class="text-indigo-600">{{ totals.grandTotal | currency }}</strong>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div class="mt-6 flex justify-between">
+    <a routerLink="/shop/checkout/step/2" class="text-sm text-indigo-600 hover:underline">
+      &larr; Back to Delivery
+    </a>
+    <button
+      (click)="submitOrder()"
+      [disabled]="submitting()"
+      class="rounded-lg bg-green-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-green-500 disabled:opacity-50"
+    >
+      {{ submitting() ? 'Processing...' : 'Place Order' }}
+    </button>
+  </div>
+
+  <!-- Optimistic confirmation -->
+  @if (orderConfirmed()) {
+    <div class="mt-4 rounded-lg bg-green-50 p-4 text-center text-sm text-green-700">
+      Order confirmed! Redirecting...
+    </div>
+  }
+</div>

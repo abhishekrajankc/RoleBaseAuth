@@ -57,3 +57,23 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+
+### 🛠️ How to Run a Local Production Performance Audit
+
+Local development builds (`ng serve`) include heavy debugging tools and unminified bundles that distort performance metrics. To accurately test production optimizations (like minified scripts, tree-shaking, and critical inlined CSS) locally on Lighthouse, use this staging flow:
+
+ 
+# 1. Compile the optimized production bundles
+```bash
+ng build --configuration production
+```
+# 2. Navigate into the compiled distribution folder
+```bash
+cd dist/RoleBaseAuth/browser
+```
+
+# 3. Serve the static assets using a fallback proxy to support SPA routing links (e.g., /shop)
+```bash
+npx http-server -p 8080 -P http://127.0.0.1:8080?
+```
