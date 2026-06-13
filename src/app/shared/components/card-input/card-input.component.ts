@@ -26,14 +26,18 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@a
         placeholder="1234 5678 9012 3456"
         maxlength="19"
         class="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-indigo-500"
-        [class.border-red-400]="!!error && touched"
+        [class.border-red-400]="!!error && touched || !touched || !isValid && touched"
       />
-      @if (error && touched) {
+      @if (error && touched && !isValid) {
         <p class="mt-1 text-xs text-red-600">{{ error }}</p>
+      }
+      @if (!error && !touched) {
+        <p class="mt-1 text-xs text-red-600">Card Number is required</p>
       }
       @if (isValid && touched) {
         <p class="mt-1 text-xs text-green-600">Valid card number</p>
       }
+      
     </div>
   `,
 })

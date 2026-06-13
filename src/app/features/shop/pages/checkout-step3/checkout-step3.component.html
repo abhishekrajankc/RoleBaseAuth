@@ -9,20 +9,62 @@
       <app-card-input formControlName="cardNumber" />
 
       <div>
+        @let cardNameCtrl = form.get('cardName');
         <label class="mb-1 block text-sm font-medium text-gray-700">Name on Card</label>
-        <input type="text" formControlName="cardName" class="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-indigo-500" />
+        <input type="text" formControlName="cardName" class="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-indigo-500"
+               [class.border-red-400]="cardNameCtrl?.invalid && cardNameCtrl?.touched" />
+
+        
+
+       @if (cardNameCtrl?.invalid && cardNameCtrl?.touched) {
+        <p class="mt-1 text-xs text-red-600">
+          @if (cardNameCtrl?.errors?.['required']) { Name on Card is required. }
+          @if (cardNameCtrl?.errors?.['pattern']) { Invalid format. }
+        </p>
+        }
+        
+
+
+
       </div>
 
       <div class="grid grid-cols-2 gap-4">
+        @let expiryCtrl = form.get('expiry');
         <div>
-          <label class="mb-1 block text-sm font-medium text-gray-700">Expiry (MM/YY)</label>
-          <input type="text" formControlName="expiry" placeholder="MM/YY" maxlength="5"
-            class="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-indigo-500" />
+          <label for="expiry" class="mb-1 block text-sm font-medium text-gray-700">Expiry (MM/YY)</label>
+          <input id="expiry"
+                 type="text"
+                 formControlName="expiry"
+                 placeholder="MM/YY"
+                 maxlength="5"
+                 class="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-indigo-500"
+                 [class.border-red-400]="expiryCtrl?.invalid && expiryCtrl?.touched" />
+
+          @if (expiryCtrl?.invalid && expiryCtrl?.touched) {
+          <p class="mt-1 text-xs text-red-600">
+            @if (expiryCtrl?.errors?.['required']) { Expiry date is required. }
+            @if (expiryCtrl?.errors?.['pattern']) { Invalid format. Use MM/YY. }
+          </p>
+          }
         </div>
+
+        @let cvvCtrl = form.get('cvv');
         <div>
-          <label class="mb-1 block text-sm font-medium text-gray-700">CVV</label>
-          <input type="text" formControlName="cvv" placeholder="123" maxlength="4"
-            class="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-indigo-500" />
+          <label for="cvv" class="mb-1 block text-sm font-medium text-gray-700">CVV</label>
+          <input id="cvv"
+                 type="text"
+                 formControlName="cvv"
+                 placeholder="123"
+                 maxlength="4"
+                 class="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-indigo-500"
+                 [class.border-red-400]="cvvCtrl?.invalid && cvvCtrl?.touched" />
+
+          @if (cvvCtrl?.invalid && cvvCtrl?.touched) {
+          <p class="mt-1 text-xs text-red-600">
+            @if (cvvCtrl?.errors?.['required']) { CVV code is required. }
+            @if (cvvCtrl?.errors?.['pattern']) { Invalid format. Must be 3 or 4 digits. }
+          </p>
+          }
         </div>
       </div>
     </div>
@@ -30,39 +72,22 @@
     <!-- Billing address toggle -->
     <div class="mb-6">
       <label class="flex cursor-pointer items-center gap-2 text-sm text-gray-700">
-        <input type="checkbox" [checked]="sameAsDelivery()" (change)="toggleBilling()" class="h-4 w-4 accent-indigo-600" />
+        <input type="checkbox" [checked]="sameAsDelivery()" (change)="toggleSameAsDelivery($any($event.target).checked)" class="h-4 w-4 accent-indigo-600" />
         Same as delivery address
       </label>
-    </div>
-
+    </div> 
     <!-- Billing address fields -->
     @if (!sameAsDelivery()) {
       <div class="mb-6 space-y-4">
         <h2 class="text-lg font-semibold text-gray-900">Billing Address</h2>
         <div class="grid gap-4 sm:grid-cols-2">
           @for (field of billingFields(); track field.key) {
-            <div [class.sm:col-span-2]="field.type === 'textarea'">
-              <div>
-                <label [for]="field.key" class="mb-1 block text-sm font-medium text-gray-700">{{ field.label }}</label>
-                @if (field.type === 'textarea') {
-                  <textarea
-                    [id]="field.key"
-                    [formControlName]="field.key"
-                    [placeholder]="field.placeholder ?? ''"
-                    rows="3"
-                    class="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-indigo-500"
-                  ></textarea>
-                } @else {
-                  <input
-                    [id]="field.key"
-                    [type]="field.type"
-                    [formControlName]="field.key"
-                    [placeholder]="field.placeholder ?? ''"
-                    class="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-indigo-500"
-                  />
-                }
-              </div>
-            </div>
+          @let formCtrl = $any(form.get(field.key));
+
+          <app-form-field [field]="field"
+                          [control]="formCtrl"
+                          [class.sm:col-span-2]="field.type === 'textarea'">
+          </app-form-field>
           }
         </div>
       </div>

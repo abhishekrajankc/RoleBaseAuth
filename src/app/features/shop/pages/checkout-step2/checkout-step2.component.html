@@ -3,39 +3,11 @@
 
   <form [formGroup]="form" class="rounded-xl bg-white p-6 shadow-sm">
     <div class="grid gap-4 sm:grid-cols-2">
-      @for (field of fields; track field.key) {
-        <div [class.sm:col-span-2]="field.type === 'textarea'">
-          <label [for]="field.key" class="mb-1 block text-sm font-medium text-gray-700">
-            {{ field.label }}
-          </label>
-          @if (field.type === 'textarea') {
-            <textarea
-              [id]="field.key"
-              [formControlName]="field.key"
-              [placeholder]="field.placeholder ?? ''"
-              rows="3"
-              class="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-indigo-500"
-              [class.border-red-400]="getControl(field.key)?.invalid && (getControl(field.key)?.touched ?? false)"
-            ></textarea>
-          } @else {
-            <input
-              [id]="field.key"
-              [type]="field.type"
-              [formControlName]="field.key"
-              [placeholder]="field.placeholder ?? ''"
-              class="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-indigo-500"
-              [class.border-red-400]="getControl(field.key)?.invalid && (getControl(field.key)?.touched ?? false)"
-            />
-          }
-          @if (getControl(field.key)?.invalid && (getControl(field.key)?.touched ?? false)) {
-            <p class="mt-1 text-xs text-red-600">
-              @if (getControl(field.key)?.errors?.['required']) { {{ field.label }} is required. }
-              @if (getControl(field.key)?.errors?.['email']) { Invalid email format. }
-              @if (getControl(field.key)?.errors?.['minlength']) { Minimum {{ getControl(field.key)?.errors?.['minlength']?.requiredLength }} characters. }
-              @if (getControl(field.key)?.errors?.['pattern']) { Invalid format. }
-            </p>
-          }
-        </div>
+      @for (field of fields; track field.key) { 
+      <app-form-field [field]="field"
+                      [control]="getControl(field.key)"
+                      [class.sm:col-span-2]="field.type === 'textarea'">
+      </app-form-field>
       }
     </div>
   </form>
@@ -46,7 +18,9 @@
     </a>
     <button
       (click)="proceed()"
-      class="rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500"
+      [class.bg-indigo-600]="form.valid"
+        [class.bg-gray-400]="form.invalid"
+  class="px-6 py-3 text-white rounded-lg font-medium transition-colors"
     >
       Proceed to Payment
     </button>

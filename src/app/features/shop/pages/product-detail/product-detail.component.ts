@@ -20,13 +20,14 @@ export class ProductDetailComponent {
   private readonly cart = inject(CartService);
   private readonly router = inject(Router);
 
+  readonly addedMessage = signal<string | null>(null);
+  readonly quantity = signal(1);
+
   /** Product resolved by the route resolver — guaranteed to exist at this point */
   readonly product = toSignal(
     this.route.data.pipe(map(data => data['product'] as Product))
   );
-
-  /** Quantity selector */
-  readonly quantity = signal(1);
+   
 
   /** Related products from the same category */
   readonly relatedProducts = toSignal(
@@ -47,8 +48,7 @@ export class ProductDetailComponent {
   readonly inStock = computed(() => {
     const CurrentProduct = this.product();
     return CurrentProduct ? CurrentProduct.stock > 0 : false;
-  })
-
+  });
 
   protected increaseQty(): void {
     const currentProduct = this.product();
@@ -59,9 +59,7 @@ export class ProductDetailComponent {
   protected decreaseQty(): void {
     this.quantity.update((q) => Math.max(q - 1, 1));
   }
-
-  readonly addedMessage = signal<string | null>(null);
-
+   
   protected addToCart(): void {
     const currentProcuct = this.product();
     if (currentProcuct)

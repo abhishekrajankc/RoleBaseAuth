@@ -1,12 +1,12 @@
 import { Component, inject } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { FieldConfig } from '../../../../shared/components/form-field/form-field.component';
+import { FieldConfig, FormFieldComponent } from '../../../../shared/components/form-field/form-field.component';
 import { markStepComplete } from '../../guards/checkout-step.guard';
 
 @Component({
   selector: 'app-checkout-step2',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, FormFieldComponent],
   templateUrl: './checkout-step2.component.html',
 })
 export class CheckoutStep2Component {
@@ -42,21 +42,13 @@ export class CheckoutStep2Component {
 
   readonly form = this.fb.group(this.buildForm());
 
-  getControl(key: string) {
-    return this.form.get(key);
-  }
-
-  isTouched(key: string) {
-    return this.form.get(key)?.touched ?? false;
-  }
-
-  getErrors(key: string) {
-    return this.form.get(key)?.errors ?? null;
+  protected getControl(key: string): FormControl {
+    return this.form.get(key) as FormControl;
   }
 
   proceed(): void {
     if (this.form.invalid) {
-      Object.keys(this.form.controls).forEach((k) => this.form.get(k)?.markAsTouched());
+      this.form.markAllAsTouched();
       return;
     }
     markStepComplete(2);

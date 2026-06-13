@@ -1,5 +1,5 @@
 import { Component, input } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 export interface ValidationRule {
   required?: boolean;
@@ -16,6 +16,7 @@ export interface FieldConfig {
   validators: ValidationRule;
 }
 
+
 @Component({
   selector: 'app-form-field',
   imports: [ReactiveFormsModule],
@@ -24,5 +25,7 @@ export interface FieldConfig {
 })
 export class FormFieldComponent {
   readonly field = input.required<FieldConfig>();
+  readonly control = input.required<FormControl>();
   readonly hidden = input(false);
+
 }

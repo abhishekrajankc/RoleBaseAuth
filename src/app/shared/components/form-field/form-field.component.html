@@ -1,55 +1,30 @@
-<!-- <div [hidden]="hidden()">
-      <label [for]="field().key" class="mb-1 block text-sm font-medium text-gray-700">
-        {{ field().label }}
-      </label>
-      @if (field().type === 'textarea') {
-        <textarea
-          [id]="field().key"
-          [formControlName]="field().key"
-          [placeholder]="field().placeholder"
-          rows="3"
-          class="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-indigo-500"
-        ></textarea>
-      } @else {
-        <input
-          [id]="field().key"
-          [type]="field().type"
-          [formControlName]="field().key"
-          [placeholder]="field().placeholder"
-          class="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-indigo-500"
-          [class.border-red-400]="control()?.invalid && (control()?.touched ?? false)"
-        />
-      }
-      @if (control()?.invalid && (control()?.touched ?? false)) {
-        <p class="mt-1 text-xs text-red-600">
-          @if (control()?.errors?.['required']) { {{ field().label }} is required. }
-          @if (control()?.errors?.['email']) { Invalid email format. }
-          @if (control()?.errors?.['minlength']) { Minimum {{ control()?.errors?.['minlength']?.requiredLength }} characters. }
-          @if (control()?.errors?.['pattern']) { Invalid format. }
-        </p>
-      }
-    </div> -->
+<div [hidden]="hidden()">
+  <label [for]="field().key" class="mb-1 block text-sm font-medium text-gray-700">
+    {{ field().label }}
+  </label>
 
+  @if (field().type === 'textarea') {
+  <textarea [id]="field().key"
+            [formControl]="control()" [placeholder]="field().placeholder ?? ''"
+            rows="3"
+            class="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-indigo-500"
+            [class.border-red-400]="control().invalid && control().touched"></textarea>
+  } @else {
+  <input [id]="field().key"
+         [type]="field().type"
+         [formControl]="control()" [placeholder]="field().placeholder ?? ''"
+         class="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-indigo-500"
+         [class.border-red-400]="control().invalid && control().touched" />
+  }
 
-    <div [hidden]="hidden()">
-      <label [for]="field().key" class="mb-1 block text-sm font-medium text-gray-700">
-        {{ field().label }}
-      </label>
-      @if (field().type === 'textarea') {
-        <textarea
-          [id]="field().key"
-          [name]="field().key"
-          [placeholder]="field().placeholder ?? ''"
-          rows="3"
-          class="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-indigo-500"
-        ></textarea>
-      } @else {
-        <input
-          [id]="field().key"
-          [name]="field().key"
-          [type]="field().type"
-          [placeholder]="field().placeholder ?? ''"
-          class="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-indigo-500"
-        />
-      }
-    </div>
+  @if (control().invalid && control().touched) {
+  <p class="mt-1 text-xs text-red-600">
+    @if (control().errors?.['required']) { {{ field().label }} is required. }
+    @if (control().errors?.['email']) { Invalid email format. }
+    @if (control().errors?.['minlength']) {
+    Minimum {{ control().errors?.['minlength']?.requiredLength }} characters.
+    }
+    @if (control().errors?.['pattern']) { Invalid format. }
+  </p>
+  }
+</div>
