@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {  DecimalPipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -47,7 +47,34 @@ export class ShopComponent implements OnInit, OnDestroy {
   // Detail
   readonly selectedProduct = signal<Product | null>(null);
 
-   
+
+  protected readonly totalPages = computed(() => Math.ceil(this.totalCount() / this.pageSize));
+  protected readonly filteredProducts = computed(() => {
+    let list = this.products();
+
+    const cats = this.selectedCategories();
+    if (cats.size) list = list.filter((p) => cats.has(p.category));
+
+    const maxPrice = this.priceRange();
+    list = list.filter((p) => p.price <= maxPrice);
+
+    if (this.inStockOnly()) list = list.filter((p) => p.stock > 0);
+
+    return list;
+  });
+  protected readonly visiblePages = computed(() => {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    const pages: number[] = [];
+
+    // Loop through all pages, but only push the ones that fall within the +/- 2 range
+    for (let i = 0; i < total; i++) {
+      if (i >= current - 2 && i <= current + 2) {
+        pages.push(i);
+      }
+    }
+    return pages;
+  });
 
   ngOnInit(): void {
     // Subscribe to shared stock stream from AdminStore
@@ -129,26 +156,9 @@ export class ShopComponent implements OnInit, OnDestroy {
   }
 
   // ---- Filtered products (client-side composition) ----
-  get filteredProducts(): Product[] {
-    let list = this.products();
-
-    const cats = this.selectedCategories();
-    if (cats.size) list = list.filter((p) => cats.has(p.category));
-
-    const maxPrice = this.priceRange();
-    list = list.filter((p) => p.price <= maxPrice);
-
-    if (this.inStockOnly()) list = list.filter((p) => p.stock > 0);
-
-    return list;
-  }
-
-  get totalPages(): number {
-    return Math.ceil(this.totalCount() / this.pageSize);
-  }
 
   loadPage(page: number): void {
-    if (page < 0 || page >= this.totalPages) return;
+    if (page < 0 || page >= this.totalPages()) return;
     this.currentPage.set(page);
     this.syncUrl();
   }

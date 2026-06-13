@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { CurrencyPipe, NgOptimizedImage } from '@angular/common';
@@ -29,7 +29,35 @@ export class ProductsComponent implements OnInit {
   readonly formData = signal({ title: '', description: '', category: '', price: 0, stock: 0, brand: '' });
 
   private readonly searchSubject = new Subject<string>();
+  protected readonly sortedProducts = computed(() => {
+    let list = [...this.store.products()];
+    const cat = this.selectedCategory();
+    if (cat) list = list.filter((p) => p.category === cat);
+    const q = this.searchQuery().toLowerCase().trim();
+    if (q) list = list.filter((p) => p.title.toLowerCase().includes(q) || p.brand?.toLowerCase().includes(q));
+    const field = this.sortField();
+    const dir = this.sortDir();
+    list.sort((a, b) => {
+      const aV = a[field]; const bV = b[field];
+      if (typeof aV === 'string' && typeof bV === 'string') return dir === 'asc' ? aV.localeCompare(bV) : bV.localeCompare(aV);
+      return dir === 'asc' ? (aV as number) - (bV as number) : (bV as number) - (aV as number);
+    });
+    return list;
+  });
+  protected readonly totalPages = computed(() => Math.ceil(this.store.totalProductsCount() / this.pageSize));
+  protected readonly visiblePages = computed(() => {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    const pages: number[] = [];
 
+    // Loop through all pages, but only push the ones that fall within the +/- 2 range
+    for (let i = 0; i < total; i++) {
+      if (i >= current - 2 && i <= current + 2) {
+        pages.push(i);
+      }
+    }
+    return pages;
+  });
   ngOnInit(): void {
     this.loadPage(0);
     this.store.getCategories().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((c) => this.categories.set(c));
@@ -78,23 +106,8 @@ export class ProductsComponent implements OnInit {
     return this.sortDir() === 'asc' ? ' ▲' : ' ▼';
   }
 
-  get sortedProducts(): Product[] {
-    let list = [...this.store.products()];
-    const cat = this.selectedCategory();
-    if (cat) list = list.filter((p) => p.category === cat);
-    const q = this.searchQuery().toLowerCase().trim();
-    if (q) list = list.filter((p) => p.title.toLowerCase().includes(q) || p.brand?.toLowerCase().includes(q));
-    const field = this.sortField();
-    const dir = this.sortDir();
-    list.sort((a, b) => {
-      const aV = a[field]; const bV = b[field];
-      if (typeof aV === 'string' && typeof bV === 'string') return dir === 'asc' ? aV.localeCompare(bV) : bV.localeCompare(aV);
-      return dir === 'asc' ? (aV as number) - (bV as number) : (bV as number) - (aV as number);
-    });
-    return list;
-  }
-
-  get totalPages(): number { return Math.ceil(this.store.totalProductsCount() / this.pageSize); }
+   
+ 
 
   loadPage(page: number): void {
     this.currentPage.set(page);

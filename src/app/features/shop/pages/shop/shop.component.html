@@ -88,43 +88,35 @@
 
     <!-- Product grid -->
     @if (!loading() && !error()) {
-      @if (filteredProducts.length === 0) {
+      @if (filteredProducts().length === 0) {
         <div class="rounded-xl bg-white p-8 text-center text-gray-400">
           No products match your filters.
         </div>
       } @else {
         <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          @for (p of filteredProducts; track p.id) {
+          @for (p of filteredProducts(); track p.id) {
             <app-product-card [product]="p" (viewDetail)="openDetail($event)" />
           }
         </div>
 
         <!-- Pagination -->
         <div class="mt-8 flex items-center justify-center gap-2">
-          <button
-            (click)="loadPage(currentPage() - 1)"
-            [disabled]="currentPage() === 0"
-            class="rounded border px-3 py-1.5 text-sm disabled:opacity-40"
-          >
+          <button (click)="loadPage(currentPage() - 1)"
+                  [disabled]="currentPage() === 0"
+                  class="rounded border px-3 py-1.5 text-sm disabled:opacity-40">
             Prev
           </button>
-          @for (_ of [].constructor(totalPages); track $index) {
-            @if ($index >= currentPage() - 2 && $index <= currentPage() + 2) {
-              <button
-                (click)="loadPage($index)"
-                class="rounded border px-3 py-1.5 text-sm"
-                [class.bg-indigo-600]="$index === currentPage()"
-                [class.text-white]="$index === currentPage()"
-              >
-                {{ $index + 1 }}
-              </button>
-            }
+          @for (pageIdx of visiblePages(); track pageIdx) {
+          <button (click)="loadPage(pageIdx)"
+                  class="rounded border px-3 py-1 text-sm transition-colors"
+                  [class.bg-indigo-600]="pageIdx === currentPage()"
+                  [class.text-white]="pageIdx === currentPage()">
+            {{ pageIdx + 1 }}
+          </button>
           }
-          <button
-            (click)="loadPage(currentPage() + 1)"
-            [disabled]="currentPage() >= totalPages - 1"
-            class="rounded border px-3 py-1.5 text-sm disabled:opacity-40"
-          >
+          <button (click)="loadPage(currentPage() + 1)"
+                  [disabled]="currentPage() >= totalPages() - 1"
+                  class="rounded border px-3 py-1.5 text-sm disabled:opacity-40">
             Next
           </button>
         </div>

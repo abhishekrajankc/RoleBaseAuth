@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CurrencyPipe } from '@angular/common';
 import { AdminStore } from '../../../../core/store/admin.store';
@@ -22,6 +22,12 @@ export class AnalyticsComponent implements OnInit {
   readonly lowStockItems = signal(0);
   readonly topCategory = signal('');
 
+  protected readonly totalDiscounted = computed(() => {
+    return this.store.orders().reduce((s, x) => s + x.discountedTotal, 0);
+  });
+  protected readonly totalSavings = computed(() => {
+    return this.totalRevenue() - this.totalDiscounted();
+  });
   ngOnInit(): void {
     this.store.fetchProducts(0, 10)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -47,11 +53,5 @@ export class AnalyticsComponent implements OnInit {
     this.topCategory.set(top ? top[0] : '');
   }
 
-  get totalDiscounted(): number {
-    return this.store.orders().reduce((s, x) => s + x.discountedTotal, 0);
-  }
-
-  get totalSavings(): number {
-    return this.totalRevenue() - this.totalDiscounted;
-  }
+  
 }
