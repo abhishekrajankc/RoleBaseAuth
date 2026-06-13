@@ -1,6 +1,6 @@
 # RoleBaseAuth
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.5.
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.0.1.
 
 ## Development server
 
